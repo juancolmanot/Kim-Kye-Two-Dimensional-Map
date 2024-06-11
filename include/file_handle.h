@@ -12,4 +12,11 @@ void read_data_file(
     int *cols
 );
 
+void read_data_file_unsigned(
+    const char *filename,
+    long double ***data,
+    unsigned int *rows,
+    unsigned int *cols
+);
+
 #endif

@@ -27,11 +27,9 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     // Check for right passed arguments.
     // ===============================================================================
-    if (argc != 6){
+    if (argc != 4	){
         perror("Wrong amount of arguments.");
-        printf("Usage: ./run-script.sh script_to_run write_to_file.dat read_from_file.dat line params_file.ini\n");
-        printf("write_to_file usually has names like 'test_kimkye_rpd_fixed_points_region(i).dat'\n");
-        printf("read_from_file is the file where the list of fixed points is stored, normally in test_kimkye_evol_fixed.dat'\n");
+        printf("Usage: ./run-script.sh script_to_run write_to_file.dat read_from_file.dat\n");
         exit(EXIT_FAILURE);
     }
 
@@ -40,14 +38,6 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     const char *write_filename = argv[2];
     const char *read_file = argv[3];
-    int line_read = atoi(argv[4]);
-    const char *params_file = argv[5];
-
-    // ===============================================================================
-    // We load parameters in params1 variable
-    // ===============================================================================
-    Parameters1 params1;
-    load_parameters_from_file(params_file, &params1, handler1);    
     
     // ===============================================================================
     // File to write to
@@ -60,74 +50,78 @@ int main(int argc, char *argv[]) {
     int rows = 0, cols = 0;
     long double **data;
     read_data_file(read_file, &data, &rows, &cols);
-    
-    // ===============================================================================
-    // Create arrays of states and initialize them.
-    // ===============================================================================
-    long double *xn;
-    long double *xn1 = calloc(2, sizeof(long double));
-    random_uniform_n(&xn, 2, (long unsigned int)time(NULL), 0, 1);
-    xn1[0] = xn1[1] = 0;
-
-    // ===============================================================================
-    // Instanciate parameters for system.
-    // ===============================================================================
-    Parameters_kimkye *params = malloc(sizeof(Parameters_kimkye));
-    params->alpha = params1.p_alpha - expl(-18);
-    params->beta = params1.p_beta;
 
     // ===============================================================================
     // Arrays for histogram of RPD.
     // ===============================================================================
     unsigned int nbins = 100;
-    long double *xi, *yi, **rpdi;
-    xi = calloc(nbins, sizeof(long double));
-    yi = calloc(nbins, sizeof(long double));
-    rpdi = (long double **)calloc(nbins, sizeof(long double));
+    long double *xi_r, *yi_r, **rpdi_r;
+    long double *xi_rprev, *yi_rprev, **rpdi_rprev;
+    xi_r = calloc(nbins, sizeof(long double));
+    yi_r = calloc(nbins, sizeof(long double));
+    xi_rprev = calloc(nbins, sizeof(long double));
+    yi_rprev = calloc(nbins, sizeof(long double));
+    rpdi_r = (long double **)calloc(nbins, sizeof(long double));
+    rpdi_rprev = (long double **)calloc(nbins, sizeof(long double));
     for (unsigned int i = 0; i < nbins; i++){
-        rpdi[i] = (long double *)calloc(nbins, sizeof(long double));
+        rpdi_r[i] = (long double *)calloc(nbins, sizeof(long double));
+        rpdi_rprev[i] = (long double *)calloc(nbins, sizeof(long double));
     }
 
     // ===============================================================================
-    // Load fixed points from data array, using the inicated line.
+    // Fill arrays of data.
     // ===============================================================================
-
-    long double *fixedpoint = calloc(2, sizeof(long double));
-    fixedpoint[0] = data[line_read][1];
-    fixedpoint[1] = data[line_read][2];
-    long double c = 5e-3; // Size of laminar radius.
-    unsigned int finalsize = (unsigned int)params1.ntarget;
+    unsigned int size_arr = (unsigned int)rows;
+    long double *xr, *yr, *xr_prev, *yr_prev;
+    xr = calloc(size_arr, sizeof(long double));
+    yr = calloc(size_arr, sizeof(long double));
+    xr_prev = calloc(size_arr, sizeof(long double));
+    yr_prev = calloc(size_arr, sizeof(long double));
+    for (int i = 0; i < rows; i++){
+    	xr[i] = data[i][1];
+    	yr[i] = data[i][2];
+    	xr_prev[i] = data[i][3];
+    	yr_prev[i] = data[i][4];
+    }
 
     // ===============================================================================
     // Compute RPD.
     // ===============================================================================
-    printf("%d\n", finalsize);
+    
+    histogram_3d(
+		rpdi_r,
+		xi_r,
+		yi_r,
+		xr,
+		yr,
+		size_arr,
+		nbins
+	);
 
-    rpd_funct_3d_fixedpoints(
-        map_kimkye,
-        xn,
-        xi,
-        yi,
-        rpdi,
-        nbins,
-        params1.N,
-        params,
-        params1.ntarget,
-        params1.transient,
-        params1.n_map,
-        &finalsize,
-        fixedpoint,
-        c
-    );
+	histogram_3d(
+		rpdi_rprev,
+		xi_rprev,
+		yi_rprev,
+		xr_prev,
+		yr_prev,
+		size_arr,
+		nbins
+	);
     
     // ===============================================================================
-    // Write to file.
+    // Write to write file.
     // ===============================================================================
-    printf("Writing to file: %s\n", write_filename);
     
     for (unsigned int i = 0; i < nbins; i++){
         for (unsigned int j = 0; j < nbins; j++){
-            fprintf(f, "%3.7Lf %3.7Lf %3.7Lf\n", xi[i], yi[j], rpdi[i][j]);
+            fprintf(f, "%3.7Lf %3.7Lf %3.7Lf %3.7Lf %3.7Lf %3.7Lf\n",
+            	xi_r[i],
+            	yi_r[j],
+            	rpdi_r[i][j],
+            	xi_rprev[i],
+            	yi_rprev[j],
+            	rpdi_rprev[i][j]
+            );
         }
     }
 
@@ -136,7 +130,8 @@ int main(int argc, char *argv[]) {
     // ===============================================================================
     
     for (unsigned int i = 0; i < nbins; i++){
-        free(rpdi[i]);
+        free(rpdi_r[i]);
+        free(rpdi_rprev[i]);
     }
 
     for (int i = 0; i < rows; i++){
@@ -144,13 +139,12 @@ int main(int argc, char *argv[]) {
     }
 
     free(data);
-    free(fixedpoint);
-    free(rpdi);
-    free(xn);
-    free(xn1);
-    free(xi);
-    free(yi);
-    free(params);
+    free(rpdi_r);
+    free(rpdi_rprev);
+    free(xi_r);
+    free(yi_r);
+    free(xi_rprev);
+    free(yi_rprev);
     fclose(f);
 
     // ===============================================================================

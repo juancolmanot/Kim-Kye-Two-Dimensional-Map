@@ -35,6 +35,32 @@ int handler1(
     return 1;
 }
 
+int handler2(
+    void *user,
+    const char* section,
+    const char* name,
+    const char* value
+){
+    Parameters1 *p = (Parameters1*)user;
+
+    #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+    if (MATCH("general", "N")) {
+        p->N = strtoul(value, NULL, 10);
+    }
+    else if (MATCH("general", "transient")) {
+        p->transient = (unsigned int)strtoul(value, NULL, 10);
+    } else if (MATCH("general", "n_map")) {
+        p->n_map = (unsigned int)strtoul(value, NULL, 10);
+    } else if (MATCH("general", "p_alpha")) {
+        p->p_alpha = strtold(value, NULL);
+    } else if (MATCH("general", "p_beta")) {
+        p->p_beta = strtod(value, NULL);
+    } else {
+        return 0;  // unknown section/name, error
+    }
+    return 1;
+}
+
 void load_parameters_from_file(
     const char* filename,
     void* params,

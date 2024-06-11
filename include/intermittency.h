@@ -33,6 +33,24 @@ bool check_ejection(
     long double c
 );
 
+bool reinjection_fixedpoints_multiple(
+    long double **fixed_points,
+    long double *xn,
+    long double *xn1,
+    unsigned int size,
+    unsigned int npoints,
+    long double c
+);
+
+bool ejection_fixedpoints_multiple(
+    long double **fixed_points,
+    long double *xn,
+    long double *xn1,
+    unsigned int size,
+    unsigned int npoints,
+    long double c
+);
+
 void reinject_states(
     void (*func)(
         long double *,
@@ -82,7 +100,6 @@ void reinject_states_fixedpoints(
     long double *yr,
     long unsigned int nevol,
     void *params,
-    double threshold,
     unsigned int ntarget,
     unsigned int ntransient,
     unsigned int n_return,
@@ -104,12 +121,53 @@ void reinject_states_prev_fixedpoints(
     long double *yr_prev,
     long unsigned int nevol,
     void *params,
-    double threshold,
     unsigned int ntarget,
     unsigned int ntransient,
     unsigned int n_return,
     unsigned int *finalsize,
     long double *fixed_point,
+    long double c
+);
+
+void reinject_states_fixedpoints_multipoints(
+    void (*func)(
+        long double *,
+        long double *,
+        void *
+    ),
+    long double *x0,
+    long double *xr,
+    long double *yr,
+    long unsigned int nevol,
+    void *params,
+    unsigned int ntarget,
+    unsigned int ntransient,
+    unsigned int n_return,
+    unsigned int *finalsize,
+    long double **fixed_points,
+    unsigned int npoints,
+    long double c
+);
+
+void reinject_states_prev_fixedpoints_multipoints(
+    void (*func)(
+        long double *,
+        long double *,
+        void *
+    ),
+    long double *x0,
+    long double *xr,
+    long double *yr,
+    long double *xr_prev,
+    long double *yr_prev,
+    long unsigned int nevol,
+    void *params,
+    unsigned int ntarget,
+    unsigned int ntransient,
+    unsigned int n_return,
+    unsigned int *finalsize,
+    long double **fixed_points,
+    unsigned int npoints,
     long double c
 );
 
@@ -196,6 +254,51 @@ void rpd_funct_3d_fixedpoints(
     unsigned int n_return,
     unsigned int *finalsize,
     long double *fixed_point,
+    long double c
+);
+
+
+void rpd_funct_fixedpoints_multiple(
+    void (*func)(
+        long double *,
+        long double *,
+        void *
+    ),
+    long double *x0,
+    long double *xi,
+    long double *rpdxi,
+    unsigned int nbins,
+    long unsigned int nevol,
+    void *params,
+    unsigned int ntarget,
+    unsigned int ntransient,
+    unsigned int n_return,
+    unsigned int *finalsize,
+    long double **fixed_point,
+    unsigned int npoints,
+    long double c,
+    unsigned int variable
+);
+
+void rpd_funct_3d_fixedpoints_multiple(
+    void (*func)(
+        long double *,
+        long double *,
+        void *
+    ),
+    long double *x0,
+    long double *xi,
+    long double *yi,
+    long double **rpdi,
+    unsigned int nbins,
+    long unsigned int nevol,
+    void *params,
+    unsigned int ntarget,
+    unsigned int ntransient,
+    unsigned int n_return,
+    unsigned int *finalsize,
+    long double **fixed_point,
+    unsigned int npoints,
     long double c
 );
 

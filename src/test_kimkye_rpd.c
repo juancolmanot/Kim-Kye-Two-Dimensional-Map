@@ -79,9 +79,11 @@ int main(int argc, char *argv[]) {
     ubound = calloc(2, sizeof(long double));
 
     lbound[0] = fileline[0];
-    lbound[1] = fileline[1];
-    ubound[0] = fileline[2];
+    lbound[1] = fileline[2];
+    ubound[0] = fileline[1];
     ubound[1] = fileline[3];
+
+    printf("%Lf %Lf %Lf %Lf\n", lbound[0], ubound[0], lbound[1], ubound[1]);
 
     long double **rpdi = (long double **)calloc(nbins, sizeof(long double));
     for (unsigned int i = 0; i < nbins; i++){

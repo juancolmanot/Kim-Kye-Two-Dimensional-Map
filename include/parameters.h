@@ -18,6 +18,13 @@ int handler1(
     const char* value
 );
 
+int handler2(
+    void *user,
+    const char* section,
+    const char* name,
+    const char* value
+);
+
 void load_parameters_from_file(
     const char* filename,
     void* params,
