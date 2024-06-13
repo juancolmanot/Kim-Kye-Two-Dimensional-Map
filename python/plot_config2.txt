@@ -1,0 +1,26 @@
+total_axes: 2
+layout: 1, 2
+figsize: 10, 6
+axes1:
+	plots: 1
+	data:
+		file: kimkye_rpd.dat
+		x_col: 0
+		y_col: 1
+		title: rpd(x) - x - alpha=0.689
+		xlabel: x
+		ylabel: rpd(x)
+		color: black
+		dot_size: 1
+axes2:
+	plots: 1
+	data:
+		file: kimkye_M.dat
+		x_col: 0
+		y_col: 1
+		title: M(x) - x - alpha=0.689
+		xlabel: x
+		ylabel: M(x)
+		color: black
+		dot_size: 1
+save_file: kk_rpd_M.pdf

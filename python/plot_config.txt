@@ -1,0 +1,26 @@
+total_axes: 2
+layout: 1, 2
+figsize: 5, 6
+axes1:
+	plots: 1
+	data:
+		file: kimkye_evol.dat
+		x_col: 0
+		y_col: 1
+		title: x(n) - n - alpha=0.689005
+		xlabel: n
+		ylabel: x(n)
+		color: black
+		dot_size: 1
+axes2:
+	plots: 1
+	data:
+		file: kimkye_evol.dat
+		x_col: 0
+		y_col: 2
+		title: y(n) - n - alpha=0.689005
+		xlabel: n
+		ylabel: y(n)
+		color: black
+		dot_size: 1
+save_file: kk_evol_x_y.pdf
